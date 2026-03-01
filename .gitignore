@@ -1,2 +1,22 @@
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+#.env
+
+# Node modules (if applicable)
+node_modules/
+
+# Docker volumes (local)
+postgres-data/
+mongo-data/
+redis-data/
+minio-data/
+kafka-data/
+grafana-data/
 
 
