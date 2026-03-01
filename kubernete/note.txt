@@ -1,0 +1,1 @@
+kubernetes dashboard token command : kubectl -n kubernetes-dashboard describe secret dashboard-admin-token

@@ -82,27 +82,31 @@ remove_all_volumes() {
 ensure_network() {
   load_env
 
-  if [[ -z "$APP_NETWORK" ]]; then
+  local network_name="${APP_NETWORK:-app-net}"
+
+  if [[ -z "$network_name" ]]; then
     echo "❌ APP_NETWORK not set in .env"
     exit 1
   fi
 
-  if docker network inspect "$APP_NETWORK" >/dev/null 2>&1; then
-    echo "✔ Network exists: $APP_NETWORK"
+  if docker network inspect "$network_name" >/dev/null 2>&1; then
+    echo "✔ Network exists: $network_name"
   else
-    echo "🌐 Creating network: $APP_NETWORK"
-    docker network create "$APP_NETWORK" >/dev/null
+    echo "🌐 Creating network: $network_name"
+    docker network create "$network_name" >/dev/null
   fi
 }
 
 remove_network() {
   load_env
 
-  if docker network inspect "$APP_NETWORK" >/dev/null 2>&1; then
-    echo "🗑 Removing network: $APP_NETWORK"
-    docker network rm "$APP_NETWORK" >/dev/null
+  local network_name="${APP_NETWORK:-app-net}"
+
+  if docker network inspect "$network_name" >/dev/null 2>&1; then
+    echo "🗑 Removing network: $network_name"
+    docker network rm "$network_name" >/dev/null
   else
-    echo "ℹ Network not found: $APP_NETWORK"
+    echo "ℹ Network not found: $network_name"
   fi
 }
 

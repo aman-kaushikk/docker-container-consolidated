@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
 set -e
 
+# Load environment variables
+if [[ ! -f ".env" ]]; then
+  echo "❌ .env file not found"
+  exit 1
+fi
+
+set -a
+source .env
+set +a
+
 PROJECT_STORAGE="storage"
 PROJECT_UI="ui"
 
 COMPOSE_STORAGE="docker-compose.storage.yml"
 COMPOSE_UI="docker-compose.ui.yml"
+
+ensure_infrastructure() {
+  echo "🔧 Setting up infrastructure..."
+  bash config.sh ensure network
+  bash config.sh ensure volumes
+}
 
 up_storage() {
   echo "⬆️  Starting STORAGE stack..."
@@ -28,6 +44,7 @@ down_ui() {
 }
 
 up_all() {
+  ensure_infrastructure
   up_storage
   up_ui
 }
@@ -38,14 +55,20 @@ down_all() {
 }
 
 usage() {
-  echo "Usage: $0 {up|down} {storage|ui|all}"
+  echo "Usage: $0 {init|up|down} {storage|ui|all}"
+  echo
+  echo "Commands:"
+  echo "  init    - Initialize infrastructure (networks and volumes)"
+  echo "  up      - Start services"
+  echo "  down    - Stop services"
   echo
   echo "Examples:"
-  echo "  $0 up storage"
-  echo "  $0 up ui"
-  echo "  $0 up all"
-  echo "  $0 down ui"
-  echo "  $0 down all"
+  echo "  $0 init all          # Setup infrastructure"
+  echo "  $0 up storage        # Start storage services"
+  echo "  $0 up ui             # Start UI services"
+  echo "  $0 up all            # Start all services (auto-initializes infrastructure)"
+  echo "  $0 down ui           # Stop UI services"
+  echo "  $0 down all          # Stop all services"
 }
 
 if [[ $# -ne 2 ]]; then
@@ -57,6 +80,9 @@ ACTION=$1
 TARGET=$2
 
 case "$ACTION:$TARGET" in
+  init:storage)  ensure_infrastructure; echo "✅ Storage infrastructure initialized" ;;
+  init:ui)       ensure_infrastructure; echo "✅ UI infrastructure initialized" ;;
+  init:all)      ensure_infrastructure; echo "✅ All infrastructure initialized" ;;
   up:storage)   up_storage ;;
   down:storage) down_storage ;;
   up:ui)        up_ui ;;
